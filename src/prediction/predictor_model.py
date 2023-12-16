@@ -14,8 +14,8 @@ import tensorflow as tf
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, Callback
 from tensorflow.keras.optimizers import Adam
 
-from prediction.vae_dense_model import VariationalAutoencoderDense as VAE
-# from prediction.vae_conv_model import VariationalAutoencoderConv as VAE
+# from prediction.vae_dense_model import VariationalAutoencoderDense as VAE
+from prediction.vae_conv_model import VariationalAutoencoderConv as VAE
 
 
 # Check for GPU availability
