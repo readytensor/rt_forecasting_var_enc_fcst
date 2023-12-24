@@ -16,8 +16,6 @@ from tensorflow.keras.optimizers import Adam
 
 # from prediction.vae_dense_model import VariationalAutoencoderDense as VAE
 from prediction.vae_conv_model import VariationalAutoencoderConv as VAE
-
-
 from logger import get_logger
 
 logger = get_logger(__name__)
@@ -144,7 +142,7 @@ class Forecaster:
         logger.info(f"Using batch_size = {self.batch_size}")
         loss_to_monitor = 'loss' if validation_split is None else 'val_loss'
         patience = get_patience_factor(X.shape[0])
-        logger.info(f"patience for early stopping: {patience}")
+        logger.info(f"patience for early stopping = {patience}")
         early_stop_callback = EarlyStopping(
             monitor=loss_to_monitor, min_delta = 1e-4, patience=patience)
         learning_rate_reduction = ReduceLROnPlateau(

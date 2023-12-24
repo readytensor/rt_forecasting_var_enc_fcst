@@ -29,7 +29,7 @@ class VariationalAutoencoderConv(BaseVariationalAutoencoder):
     def __init__(
             self,
             hidden_layer_sizes,
-            **kwargs           
+            **kwargs  
         ):
         super(VariationalAutoencoderConv, self).__init__(**kwargs)
         self.hidden_layer_sizes = hidden_layer_sizes

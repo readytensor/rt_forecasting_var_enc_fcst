@@ -30,23 +30,16 @@ class VariationalAutoencoderDense(BaseVariationalAutoencoder):
         self.decoder = self._get_decoder()
 
     def _get_encoder(self):
-        self.encoder_inputs = Input(shape=(self.encode_len, self.feat_dim), name='encoder_input')
+        encoder_inputs = Input(shape=(self.encode_len, self.feat_dim), name='encoder_input')
 
-        x = self.encoder_inputs
+        x = Flatten()(encoder_inputs)
         for i, M_out in enumerate(self.hidden_layer_sizes):
             x = Dense(M_out, activation='relu', name=f'enc_dense_{i}')(x)
 
         z_mean = Dense(self.latent_dim, name="z_mean")(x)
         z_log_var = Dense(self.latent_dim, name="z_log_var")(x)
-        encoder_output = Sampling()([z_mean, z_log_var])     
-        self.encoder_output = encoder_output
-        
-        encoder = Model(
-            self.encoder_inputs,
-            [z_mean, z_log_var, encoder_output],
-            name="encoder"
-        )
-        # encoder.summary()
+        encoder_output = Sampling()([z_mean, z_log_var])          
+        encoder = Model(encoder_inputs, [z_mean, z_log_var, encoder_output], name="encoder")
         return encoder
 
 
@@ -56,7 +49,6 @@ class VariationalAutoencoderDense(BaseVariationalAutoencoder):
         x = decoder_inputs
         for i, M_out in enumerate(reversed(self.hidden_layer_sizes)):
             x = Dense(M_out, activation='relu', name=f'dec_dense_{i}')(x)
-        self.decoder_outputs = Dense(self.decode_len, name='decoder_output')(x)
-        decoder = Model(decoder_inputs, self.decoder_outputs, name="decoder")
-        # decoder.summary()
+        decoder_outputs = Dense(self.decode_len, name='decoder_output')(x)
+        decoder = Model(decoder_inputs, decoder_outputs, name="decoder")
         return decoder
