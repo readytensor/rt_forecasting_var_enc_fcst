@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Tuple, Union
 import numpy as np
 import pandas as pd
 import tensorflow as tf
-import subprocess
+from tensorflow.python.client import device_lib
 
 
 def read_json_as_dict(input_path: str) -> Dict:
@@ -254,16 +254,13 @@ class TimeAndMemoryTracker(object):
         self.gpu_memory_usage_peak = None
 
     def log_gpu_memory(self):
-        # Execute the nvidia-smi command to query GPU details
-        result = subprocess.run(
-            ["nvidia-smi", "--query-gpu=memory.used", "--format=csv,nounits,noheader"],
-            stdout=subprocess.PIPE,
-        )
-        # Decode the output to UTF-8 and split lines
-        memory_usage_list = result.stdout.decode("utf-8").strip().split("\n")
-        # Convert memory usage to integers and log or return them
-        memory_usage = [int(x) for x in memory_usage_list]
-        print("GPU Memory Usage (MB):", memory_usage)
+        # List all available GPUs
+        physical_devices = tf.config.list_physical_devices("GPU")
+
+        # For each GPU, print memory info
+        for gpu in physical_devices:
+            memory_info = tf.config.experimental.get_memory_info(gpu.name)
+            self.logger.info(f"Memory Info for {gpu.name}: {memory_info}")
 
     def __enter__(self):
         tracemalloc.start()
