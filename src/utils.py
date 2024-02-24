@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Tuple, Union
 import numpy as np
 import pandas as pd
 import tensorflow as tf
-from sklearn.model_selection import train_test_split
+import subprocess
 
 
 def read_json_as_dict(input_path: str) -> Dict:
@@ -253,19 +253,21 @@ class TimeAndMemoryTracker(object):
         self.gpu_memory_usage_start = None
         self.gpu_memory_usage_peak = None
 
-    def _get_gpu_memory_usage(self):
-        """Returns the current GPU memory usage if possible."""
-        memory_info = tf.config.experimental.get_memory_info("GPU:0")
-        return memory_info[
-            "current"
-        ]  # This may need adjustments based on your GPU setup
+    def log_gpu_memory(self):
+        # Execute the nvidia-smi command to query GPU details
+        result = subprocess.run(
+            ["nvidia-smi", "--query-gpu=memory.used", "--format=csv,nounits,noheader"],
+            stdout=subprocess.PIPE,
+        )
+        # Decode the output to UTF-8 and split lines
+        memory_usage_list = result.stdout.decode("utf-8").strip().split("\n")
+        # Convert memory usage to integers and log or return them
+        memory_usage = [int(x) for x in memory_usage_list]
+        print("GPU Memory Usage (MB):", memory_usage)
 
     def __enter__(self):
         tracemalloc.start()
         self.start_time = time.time()
-        if tf.config.list_physical_devices("GPU"):
-            self.gpu_memory_usage_start = self._get_gpu_memory_usage()
-            self.gpu_memory_usage_peak = self.gpu_memory_usage_start
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -279,12 +281,4 @@ class TimeAndMemoryTracker(object):
         self.logger.info(f"Execution time: {elapsed_time:.2f} seconds")
         self.logger.info(f"CPU Memory allocated (peak): {cpu_peak_memory:.2f} MB")
 
-        if tf.config.list_physical_devices("GPU"):
-            current_gpu_memory_usage = self._get_gpu_memory_usage()
-            gpu_peak_memory = (
-                max(self.gpu_memory_usage_peak, current_gpu_memory_usage)
-                - self.gpu_memory_usage_start
-            )
-            self.logger.info(
-                f"GPU Memory allocated (peak estimated): {gpu_peak_memory / 1024**2:.2f} MB"
-            )
+        self.log_gpu_memory()
