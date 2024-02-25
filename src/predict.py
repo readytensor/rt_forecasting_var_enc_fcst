@@ -125,23 +125,24 @@ def run_batch_predictions(
         inference_pipeline = load_pipeline_of_type(
             preprocessing_dir_path, pipeline_type="inference"
         )
-        _, transformed_train_data = fit_transform_with_pipeline(
-            inference_pipeline, validated_train_data
-        )
 
         logger.info("Loading predictor model...")
         predictor_model = load_predictor_model(predictor_dir_path)
 
-        logger.info("Making predictions...")
         with TimeAndMemoryTracker(logger) as _:
+            logger.info("Transforming data...")
+            _, transformed_train_data = fit_transform_with_pipeline(
+                inference_pipeline, validated_train_data
+            )
+            logger.info("Making predictions...")
             predictions_arr = predict_with_model(
                 predictor_model, transformed_train_data
             )
 
-        logger.info("Rescaling predictions...")
-        rescaled_preds_arr = inverse_scale_predictions(
-            predictions_arr, inference_pipeline
-        )
+            logger.info("Rescaling predictions...")
+            rescaled_preds_arr = inverse_scale_predictions(
+                predictions_arr, inference_pipeline
+            )
 
         logger.info("Creating final predictions dataframe...")
         predictions_df = create_predictions_dataframe(
