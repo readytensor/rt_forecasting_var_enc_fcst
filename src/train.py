@@ -15,7 +15,7 @@ from utils import (
     read_csv_in_directory,
     read_json_as_dict,
     set_seeds,
-    TimeAndMemoryTracker,
+    # TimeAndMemoryTracker,
 )
 
 logger = get_logger(task_name="train")
@@ -97,12 +97,12 @@ def run_training(
 
         # # use default hyperparameters to train model
         logger.info("Training forecaster...")
-        with TimeAndMemoryTracker(logger) as _:
-            forecaster = train_predictor_model(
-                history=transformed_data,
-                forecast_length=data_schema.forecast_length,
-                hyperparameters=default_hyperparameters,
-            )
+        # with TimeAndMemoryTracker(logger) as _:
+        forecaster = train_predictor_model(
+            history=transformed_data,
+            forecast_length=data_schema.forecast_length,
+            hyperparameters=default_hyperparameters,
+        )
 
         # save predictor model
         logger.info("Saving forecaster...")
