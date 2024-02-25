@@ -259,8 +259,10 @@ class TimeAndMemoryTracker(object):
 
         # For each GPU, print memory info
         for gpu in physical_devices:
-            memory_info = tf.config.experimental.get_memory_info(gpu.name)
-            self.logger.info(f"Memory Info for {gpu.name}: {memory_info}")
+            device_index = gpu.name.split(":")[-1]
+            simplified_device_name = f"GPU:{device_index}"
+            memory_info = tf.config.experimental.get_memory_info(simplified_device_name)
+            self.logger.info(f"Memory Info for {simplified_device_name}: {memory_info}")
 
     def __enter__(self):
         tracemalloc.start()
