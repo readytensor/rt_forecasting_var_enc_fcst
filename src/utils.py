@@ -278,4 +278,4 @@ class TimeAndMemoryTracker(object):
         self.logger.info(f"Execution time: {elapsed_time:.2f} seconds")
         self.logger.info(f"CPU Memory allocated (peak): {cpu_peak_memory:.2f} MB")
 
-        # self.log_gpu_memory()
+        self.log_gpu_memory()
