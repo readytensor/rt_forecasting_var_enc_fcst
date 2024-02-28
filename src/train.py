@@ -81,28 +81,27 @@ def run_training(
         logger.info("Loading hyperparameters...")
         default_hyperparameters = read_json_as_dict(default_hyperparameters_file_path)
 
-        # fit and transform using pipeline and target encoder, then save them
-        logger.info("Training preprocessing pipeline...")
-        training_pipeline, inference_pipeline, encode_len = get_preprocessing_pipelines(
-            data_schema, validated_data, preprocessing_config, default_hyperparameters
-        )
-        trained_pipeline, transformed_data = fit_transform_with_pipeline(
-            training_pipeline, validated_data
-        )
-        print("Transformed training data shape:", transformed_data.shape)
-
-        # Save pipelines
-        logger.info("Saving pipelines...")
-        save_pipelines(trained_pipeline, inference_pipeline, preprocessing_dir_path)
-
-        # # use default hyperparameters to train model
-        logger.info("Training forecaster...")
+        
         with TimeAndMemoryTracker(logger) as _:
+            # fit and transform using pipeline and target encoder, then save them
+            logger.info("Training preprocessing pipeline...")
+            training_pipeline, inference_pipeline, encode_len = get_preprocessing_pipelines(
+                data_schema, validated_data, preprocessing_config, default_hyperparameters
+            )
+            trained_pipeline, transformed_data = fit_transform_with_pipeline(
+                training_pipeline, validated_data
+            )
+
+            logger.info("Training forecaster...")
             forecaster = train_predictor_model(
                 history=transformed_data,
                 forecast_length=data_schema.forecast_length,
                 hyperparameters=default_hyperparameters,
             )
+
+        # Save pipelines
+        logger.info("Saving pipelines...")
+        save_pipelines(trained_pipeline, inference_pipeline, preprocessing_dir_path)
 
         # save predictor model
         logger.info("Saving forecaster...")
