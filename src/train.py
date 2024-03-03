@@ -15,8 +15,9 @@ from utils import (
     read_csv_in_directory,
     read_json_as_dict,
     set_seeds,
-    TimeAndMemoryTracker,
+    # TimeAndMemoryTracker,
 )
+import tensorflow as tf
 
 logger = get_logger(task_name="train")
 
@@ -82,22 +83,24 @@ def run_training(
         default_hyperparameters = read_json_as_dict(default_hyperparameters_file_path)
 
         
-        with TimeAndMemoryTracker(logger) as _:
+        # with TimeAndMemoryTracker(logger) as _:
             # fit and transform using pipeline and target encoder, then save them
-            logger.info("Training preprocessing pipeline...")
-            training_pipeline, inference_pipeline, encode_len = get_preprocessing_pipelines(
-                data_schema, validated_data, preprocessing_config, default_hyperparameters
-            )
-            trained_pipeline, transformed_data = fit_transform_with_pipeline(
-                training_pipeline, validated_data
-            )
+        logger.info("Training preprocessing pipeline...")
+        training_pipeline, inference_pipeline, encode_len = get_preprocessing_pipelines(
+            data_schema, validated_data, preprocessing_config, default_hyperparameters
+        )
+        trained_pipeline, transformed_data = fit_transform_with_pipeline(
+            training_pipeline, validated_data
+        )
+        memory_info = tf.config.experimental.get_memory_info("GPU:0")
 
-            logger.info("Training forecaster...")
-            forecaster = train_predictor_model(
-                history=transformed_data,
-                forecast_length=data_schema.forecast_length,
-                hyperparameters=default_hyperparameters,
-            )
+        print(memory_info)
+        logger.info("Training forecaster...")
+        forecaster = train_predictor_model(
+            history=transformed_data,
+            forecast_length=data_schema.forecast_length,
+            hyperparameters=default_hyperparameters,
+        )
 
         # Save pipelines
         logger.info("Saving pipelines...")
