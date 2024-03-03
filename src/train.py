@@ -17,7 +17,6 @@ from utils import (
     set_seeds,
     ResourceTracker,
 )
-import tensorflow as tf
 
 logger = get_logger(task_name="train")
 
