@@ -250,7 +250,6 @@ def get_peak_memory_usage():
     if not tf.config.list_physical_devices("GPU"):
         return None
 
-    print(tf.config.list_physical_devices("GPU"))
     current_device = "GPU:0"
     peak_memory = tf.config.experimental.get_memory_info(current_device)["peak"]
     return peak_memory / (1024 * 1024)
