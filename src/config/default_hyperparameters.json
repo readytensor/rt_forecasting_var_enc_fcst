@@ -1,12 +1,12 @@
 {
-  "encode_to_decode_ratio": 4,
+  "encode_to_decode_ratio": 5,
   "min_windows": 25,
   "min_encode_len_ratio": 0.4,
   "latent_dim": 5,
   "first_hidden_dim": 250,
   "second_hidden_dim": 50,
   "third_hidden_dim": 25,
-  "reconstruction_wt": 100.0,
+  "reconstruction_wt": 100,
   "use_exogenous": true,
-  "learning_rate": 1e-3
+  "learning_rate": 0.001
 }
