@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Tuple, Union
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+from config import paths
 
 
 def read_json_as_dict(input_path: str) -> Dict:
